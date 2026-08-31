@@ -1,0 +1,18 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:23:57.436Z
+---
+block-beta
+  columns 3
+  Runtime["Runtime Initialization"] State["Game State"] Game["Game Controller"]
+  Input["Keyboard Input"] Objects["Game Objects"] Output["Rendering and Audio"]
+  PygameZero["Pygame Zero"]
+
+  Runtime --> State
+  State --> Game
+  Input --> Game
+  Game --> Objects
+  Objects --> Output
+  PygameZero --> Runtime
+  PygameZero --> Output

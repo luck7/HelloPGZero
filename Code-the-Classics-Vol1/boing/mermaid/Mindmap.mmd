@@ -1,0 +1,74 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:22:54.703Z
+---
+mindmap
+  root((Boing Game))
+    Runtime
+      "Python version check"
+      "Pygame Zero version check"
+      "pgzrun.go entry point"
+      "Global game state"
+    Game Model
+      Game
+        "Game update loop"
+        "Rendering"
+        "Scoring"
+        "Sound playback"
+      Ball
+        "Movement and physics"
+        "Bat collisions"
+        "Wall bouncing"
+        "Out of bounds detection"
+      Bat
+        "Player control"
+        "AI control"
+        "Score and animation timer"
+      Impact
+        "Bounce animation"
+        "Temporary effects"
+    Game States
+      "MENU"
+        "Attract mode"
+        "Player count selection"
+        "Start game"
+      "PLAY"
+        "Update objects"
+        "Check winning score"
+      "GAME_OVER"
+        "Display result"
+        "Return to menu"
+    Input
+      "Player 1 controls"
+        "A key"
+        "Z key"
+        "Arrow keys"
+      "Player 2 controls"
+        "K key"
+        "M key"
+      "Space key"
+        "Start game"
+        "Restart game"
+    Presentation
+      "Background table"
+      "Bat sprites"
+      "Ball sprite"
+      "Impact sprites"
+      "Score display"
+      "Menu screen"
+      "Game over screen"
+    Audio
+      "Theme music"
+      "Bounce sounds"
+      "Hit sounds"
+      "Scoring sounds"
+      "Menu sounds"
+    Dependencies
+      pgzero
+      pgzrun
+      pygame
+      math
+      sys
+      random
+      "enum.Enum"

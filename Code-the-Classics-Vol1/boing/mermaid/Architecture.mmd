@@ -1,0 +1,46 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:22:04.160Z
+---
+architecture-beta
+    group runtime(server)[Game Runtime]
+    group objects(server)[Game Objects]
+    group input(server)[Input Interface]
+    group presentation(disk)[Presentation Media]
+    group platform(cloud)[Platform Services]
+
+    service entry(server)[Game Entry] in runtime
+    service loop(server)[Game Loop] in runtime
+    service state(server)[Game State] in runtime
+    service controller(server)[Game Controller] in runtime
+
+    service ball(server)[Ball Physics] in objects
+    service bat(server)[Bat Control] in objects
+    service impact(server)[Impact Effects] in objects
+
+    service keyboard(server)[Keyboard Input] in input
+    service controls(server)[Player Controls] in input
+
+    service renderer(server)[Screen Renderer] in presentation
+    service audio(server)[Sound Mixer] in presentation
+    service assets(disk)[Game Assets] in presentation
+
+    service pgzero(server)[Pygame Zero] in platform
+    service pygame(server)[Pygame] in platform
+
+    entry{group}:R --> L:pgzero{group}
+    pgzero{group}:B --> T:loop{group}
+
+    keyboard:R --> L:controls
+    controls:R --> L:bat
+
+    loop:R --> L:controller
+    controller{group}:R --> L:ball{group}
+    controller{group}:B --> T:impact{group}
+
+    controller{group}:R --> L:renderer{group}
+    controller{group}:B --> T:audio{group}
+    assets:T --> B:renderer
+
+    pygame{group}:R --> L:audio{group}

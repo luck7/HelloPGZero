@@ -102,6 +102,7 @@ class Ball(Actor):
                 if self.x < HALF_WIDTH:
                     new_dir_x = 1
                     bat = game.bats[0]
+                    bat.y = self.y
                 else:
                     new_dir_x = -1
                     bat = game.bats[1]

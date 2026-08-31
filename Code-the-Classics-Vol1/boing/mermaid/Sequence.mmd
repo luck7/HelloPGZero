@@ -1,0 +1,190 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:17:14.298Z
+---
+sequenceDiagram
+    participant Runtime as Pygame Zero Runtime
+    participant Keyboard
+    participant Loop as Game Loop
+    participant Game
+    participant Bat
+    participant Ball
+    participant Impact
+    participant Audio as Pygame Audio
+    participant Screen
+
+    activate Runtime
+    activate Keyboard
+    activate Loop
+    activate Game
+    activate Bat
+    activate Ball
+    activate Impact
+    activate Audio
+    activate Screen
+
+    Runtime->>Runtime: Validate Python and Pygame Zero versions
+    alt Version requirement not met
+        Runtime->>Runtime: Print error and exit
+    else Requirements satisfied
+        Runtime->>Audio: Initialize mixer
+        alt Audio initialization succeeds
+            Audio-->>Runtime: Mixer ready
+            Runtime-)Audio: Play theme music
+            Runtime-)Audio: Set volume
+        else Audio initialization fails
+            Audio-->>Runtime: Raise sound-device exception
+            Runtime->>Runtime: Ignore audio error
+        end
+
+        Runtime->>Game: Create initial Game()
+        Game->>Bat: Create left Bat with AI control
+        Bat-->>Game: Left bat initialized
+        Game->>Bat: Create right Bat with AI control
+        Bat-->>Game: Right bat initialized
+        Game->>Ball: Create Ball(-1)
+        Ball-->>Game: Ball initialized at screen center
+        Game->>Game: Initialize impacts and ai_offset
+        Game-->>Runtime: Initial menu game ready
+        Runtime->>Loop: Start pgzrun.go()
+
+        loop Every Pygame Zero frame
+            Loop->>Keyboard: Read keyboard state
+            Keyboard-->>Loop: Key state
+
+            Loop->>Loop: Detect space_pressed
+
+            alt State is MENU
+                alt Space was just pressed
+                    Loop->>Loop: Set state to PLAY
+                    Loop->>Game: Create Game(controls)
+                    Game->>Bat: Create player-one bat
+                    Bat-->>Game: Player-one bat ready
+                    Game->>Bat: Create player-two bat or AI bat
+                    Bat-->>Game: Player-two bat ready
+                    Game->>Ball: Create Ball(-1)
+                    Ball-->>Game: New ball ready
+                else Space not pressed
+                    alt Switch to two-player mode
+                        Loop->>Game: play_sound("down", menu_sound=True)
+                        Game-)Audio: Play menu sound
+                        Loop->>Loop: Set num_players to 2
+                    else Switch to one-player mode
+                        Loop->>Game: play_sound("up", menu_sound=True)
+                        Game-)Audio: Play menu sound
+                        Loop->>Loop: Set num_players to 1
+                    else Menu remains active
+                        Loop->>Game: update() attract mode
+                    end
+
+                    Game->>Bat: update() for each bat
+                    Bat->>Bat: Run player controls or ai()
+                    Bat->>Keyboard: Read movement keys
+                    Keyboard-->>Bat: Movement state
+                    Bat->>Bat: Clamp Y position and select sprite
+                    Game->>Ball: update()
+                    Ball->>Ball: Move through speed-based substeps
+
+                    alt Ball collides with a bat
+                        Ball->>Bat: Check bat position
+                        Bat-->>Ball: Collision position
+                        Ball->>Ball: Reverse dx and adjust dy
+                        Ball->>Ball: Normalize direction vector
+                        Ball->>Impact: Create bounce impact
+                        Impact-->>Game: Append impact effect
+                        Ball->>Game: Increase speed and set ai_offset
+                        Ball->>Bat: Set bat timer
+                        Ball->>Game: play_sound("hit", count)
+                        Game-)Audio: Play hit sound variant
+                    else Ball reaches top or bottom wall
+                        Ball->>Ball: Reverse dy and correct position
+                        Ball->>Impact: Create wall impact
+                        Impact-->>Game: Append impact effect
+                        Ball->>Game: play_sound("bounce", count)
+                        Game-)Audio: Play bounce sound
+                        Ball->>Game: play_sound("bounce_synth")
+                        Game-)Audio: Play synthesizer sound
+                    end
+
+                    loop Expire old impact effects
+                        Game->>Impact: update()
+                        Impact->>Impact: Advance animation frame
+                        alt Impact timer reaches 10
+                            Game->>Game: Remove impact from list
+                        else Impact remains active
+                            Game->>Game: Keep impact in list
+                        end
+                    end
+                end
+
+            else State is PLAY
+                alt Either player score exceeds 9
+                    Loop->>Loop: Set state to GAME_OVER
+                else Match continues
+                    Loop->>Game: update()
+                    Game->>Bat: Update both bats
+                    Game->>Ball: Update ball
+                    Game->>Impact: Update active impacts
+
+                    alt Ball leaves left or right screen edge
+                        Game->>Ball: out()
+                        Ball-->>Game: True
+                        Game->>Game: Determine scoring and losing player
+
+                        alt Losing bat timer is below zero
+                            Game->>Bat: Increment scoring player's score
+                            Game->>Game: play_sound("score_goal")
+                            Game-)Audio: Play goal sound
+                            Game->>Bat: Set losing bat timer to 20
+                        else Losing bat timer is zero
+                            Game->>Ball: Create replacement ball
+                            Ball-->>Game: Ball aimed toward missed side
+                        else Losing bat is displaying score effect
+                            Game->>Game: Wait for replacement-ball frame
+                        end
+                    else Ball remains in play
+                        Game->>Game: Continue match
+                    end
+                end
+
+            else State is GAME_OVER
+                alt Space was just pressed
+                    Loop->>Loop: Set state to MENU
+                    Loop->>Loop: Reset num_players to 1
+                    Loop->>Game: Create attract-mode Game()
+                    Game-->>Loop: Menu game ready
+                else Waiting for restart
+                    Loop->>Loop: Keep game-over state
+                end
+            end
+
+            Loop->>Game: draw()
+            Game->>Screen: Draw table background
+            Game->>Screen: Draw score effects when applicable
+            Game->>Bat: Draw both bats
+            Game->>Ball: Draw ball
+            Game->>Impact: Draw active impacts
+            Game->>Screen: Draw player scores
+
+            alt State is MENU
+                Loop->>Screen: Draw menu image
+            else State is GAME_OVER
+                Loop->>Screen: Draw game-over image
+            else State is PLAY
+                Loop->>Screen: Keep gameplay display
+            end
+        end
+    end
+
+    Loop-->>Runtime: Frame processing complete
+    Runtime->>Audio: Stop audio and release mixer
+    deactivate Screen
+    deactivate Impact
+    deactivate Ball
+    deactivate Bat
+    deactivate Game
+    deactivate Audio
+    deactivate Keyboard
+    deactivate Loop
+    deactivate Runtime

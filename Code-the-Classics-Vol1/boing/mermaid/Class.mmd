@@ -1,0 +1,66 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:13:37.790Z
+---
+classDiagram
+    direction TB
+
+    class Actor {
+        <<external>>
+    }
+
+    class Impact {
+        +int time
+        +__init__(pos) void
+        +update() void
+    }
+
+    class Ball {
+        +float x
+        +float y
+        +float dx
+        +float dy
+        +int speed
+        +__init__(dx) void
+        +update() void
+        +out() boolean
+    }
+
+    class Bat {
+        +int player
+        +int score
+        +int timer
+        +__init__(player, move_func) void
+        +update() void
+        +ai() float
+    }
+
+    class Game {
+        +List~Bat~ bats
+        +Ball ball
+        +List~Impact~ impacts
+        +int ai_offset
+        +__init__(controls) void
+        +update() void
+        +draw() void
+        +play_sound(name, count, menu_sound) void
+    }
+
+    class State {
+        <<enumeration>>
+        MENU
+        PLAY
+        GAME_OVER
+    }
+
+    Actor <|-- Impact : inherits
+    Actor <|-- Ball : inherits
+    Actor <|-- Bat : inherits
+
+    Game "1" *-- "2" Bat : owns
+    Game "1" *-- "1" Ball : owns
+    Game "1" o-- "*" Impact : tracks
+    Ball --> Game : accesses global game
+    Bat --> Game : accesses global game
+    Game --> State : uses

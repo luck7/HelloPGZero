@@ -1,0 +1,41 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:20:57.843Z
+---
+erDiagram
+    GAME {
+        int id PK
+        int current_state_id FK
+        int ai_offset
+    }
+    BAT {
+        int id PK
+        int game_id FK
+        int player
+        int score
+        int timer
+    }
+    BALL {
+        int id PK
+        int game_id FK
+        float x
+        float y
+        float dx
+        float dy
+        int speed
+    }
+    IMPACT {
+        int id PK
+        int game_id FK
+        int time
+    }
+    STATE {
+        int id PK
+        string name
+    }
+
+    GAME ||--|{ BAT : contains
+    GAME ||--|| BALL : contains
+    GAME ||--o{ IMPACT : tracks
+    GAME ||--|| STATE : uses

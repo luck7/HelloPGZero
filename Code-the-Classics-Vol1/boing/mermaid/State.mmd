@@ -1,0 +1,44 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:19:22.391Z
+---
+stateDiagram-v2
+    direction TB
+
+    Idle: MENU
+    Active: PLAY
+    GameOver: GAME_OVER
+
+    [*] --> Idle
+
+    Idle --> Active : space_pressed / create Game
+    Idle --> Idle : up/down / change num_players
+    Idle --> Idle : each frame / attract-mode update
+
+    state Active {
+        [*] --> Running
+
+        state Running {
+            [*] --> FrameUpdate
+            FrameUpdate --> FrameUpdate : update bats, ball, impacts
+            FrameUpdate --> FrameUpdate : draw game frame
+        }
+
+        --
+        
+        state Controls {
+            [*] --> PlayerOrAI
+            PlayerOrAI --> PlayerOrAI : keyboard input or AI movement
+        }
+
+        Running --> [*]
+        Controls --> [*]
+    }
+
+    Active --> GameOver : score > 9 / set GAME_OVER
+    GameOver --> Idle : space_pressed / reset game and players
+    GameOver --> [*] : session_end
+
+    note right of Active : Ball collisions, scoring, sounds, and animations
+    note right of GameOver : Displays game-over screen

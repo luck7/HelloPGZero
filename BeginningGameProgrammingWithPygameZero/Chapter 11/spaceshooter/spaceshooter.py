@@ -6,19 +6,19 @@ from player import Player
 from shot import Shot
 from enemies import Enemies
 
-WIDTH=800
-HEIGHT=600
-TITLE="Space shooter game"
-ICON="spacecrafticon.png"
+WIDTH = 800
+HEIGHT = 600
+TITLE = "Space shooter game"
+ICON = "spacecrafticon.png"
 
 scroll_speed = 2
 
 player = Player()
 
-spacecraft = SpaceShip("spacecraft", (400,480))
+spacecraft = SpaceShip("spacecraft", (400, 480))
 spacecraft.set_speed(4)
 
-enemies = Enemies((WIDTH,HEIGHT), "enemies.dat")
+enemies = Enemies((WIDTH, HEIGHT), "enemies.dat")
 
 # List to track shots
 shots = []
@@ -32,8 +32,21 @@ scroll_position = 0
 # spacecraft hit points
 # positions relative to spacecraft centre which classes as a collide
 spacecraft_hit_pos = [
-    (0,-40), (10,-30), (-10,-30), (13,-15), (-13,-15), (25,-3), (-25,-3),
-    (46,12), (-46,12), (25,24), (-25,24), (10,27), (-10,27), (0,27) ]
+    (0, -40),
+    (10, -30),
+    (-10, -30),
+    (13, -15),
+    (-13, -15),
+    (25, -3),
+    (-25, -3),
+    (46, 12),
+    (-46, 12),
+    (25, 24),
+    (-25, 24),
+    (10, 27),
+    (-10, 27),
+    (0, 27),
+]
 
 # Status
 # "start" = Press fire to start
@@ -44,10 +57,11 @@ status = "start"
 # value for waiting when asking for option
 wait_timer = 0
 
-def draw ():
+
+def draw():
     # Scrolling background
-    screen.blit("background", (0,scroll_position-600))
-    screen.blit("background", (0,scroll_position))
+    screen.blit("background", (0, scroll_position - 600))
+    screen.blit("background", (0, scroll_position))
 
     enemies.draw(screen)
 
@@ -56,13 +70,37 @@ def draw ():
     for this_shot in shots:
         this_shot.draw()
 
-    screen.draw.text("Score: {}".format(player.score), fontname="computerspeak", fontsize=40, topleft=(30,30), color=(255,255,255))
-    screen.draw.text("Lives: {}".format(player.lives), fontname="computerspeak", fontsize=40, topright=(770,30), color=(255,255,255))
+    screen.draw.text(
+        "Score: {}".format(player.score),
+        fontname="computerspeak",
+        fontsize=40,
+        topleft=(30, 30),
+        color=(255, 255, 255),
+    )
+    screen.draw.text(
+        "Lives: {}".format(player.lives),
+        fontname="computerspeak",
+        fontsize=40,
+        topright=(770, 30),
+        color=(255, 255, 255),
+    )
 
     if status == "start" or status == "start-wait":
-        screen.draw.text("Press fire to start game", fontname="computerspeak", fontsize=40, center=(400,300), color=(255,255,255))
+        screen.draw.text(
+            "Press fire to start game",
+            fontname="computerspeak",
+            fontsize=40,
+            center=(400, 300),
+            color=(255, 255, 255),
+        )
     elif status == "gameover" or status == "gameover-wait":
-        screen.draw.text("Game Over", fontname="computerspeak", fontsize=40, center=(400,200), color=(255,255,255))
+        screen.draw.text(
+            "Game Over",
+            fontname="computerspeak",
+            fontsize=40,
+            center=(400, 200),
+            color=(255, 255, 255),
+        )
 
 
 def update(time_interval):
@@ -76,7 +114,7 @@ def update(time_interval):
         wait_timer = time.time() + DELAY_TIME
         status = "start-wait"
     if status == "start-wait":
-        if (time.time() < wait_timer):
+        if time.time() < wait_timer:
             return
         if keyboard.space or keyboard.lshift:
             player.reset()
@@ -87,14 +125,14 @@ def update(time_interval):
         wait_timer = time.time() + DELAY_TIME
         status = "gameover-wait"
     elif status == "gameover-wait":
-        if (time.time() < wait_timer):
+        if time.time() < wait_timer:
             return
         if keyboard.space or keyboard.lshift:
             status = "start"
     elif status == "game":
         # Scroll screen
         scroll_position += scroll_speed
-        if (scroll_position >= 600):
+        if scroll_position >= 600:
             scroll_position = 0
 
         # Update existing shots
@@ -132,9 +170,9 @@ def update(time_interval):
             spacecraft.move("right")
         if keyboard.space or keyboard.lshift:
             # check if time since last shot reached
-            if (time.time() > shot_last_fired + time_between_shots):
+            if time.time() > shot_last_fired + time_between_shots:
                 # rest time last fired
                 shot_last_fired = time.time()
-                shots.append(Shot("shot",(spacecraft.x,spacecraft.y-25)))
+                shots.append(Shot("shot", (spacecraft.x, spacecraft.y - 25)))
                 # Play sound of gun firing
                 sounds.space_gun.play()

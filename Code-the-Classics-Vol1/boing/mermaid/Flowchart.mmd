@@ -1,0 +1,51 @@
+---
+references:
+  - "File: /Code-the-Classics-Vol1/boing/boing.py"
+generationTime: 2026-08-24T04:12:17.772Z
+---
+flowchart TD
+    A(["Program Start"]) --> B["Validate Python version"]
+    B --> C{"Python version valid?"}
+    C -->|No| D["Print error and sys.exit()"]
+    C -->|Yes| E["Validate Pygame Zero version"]
+    E --> F{"Pygame Zero version valid?"}
+    F -->|No| D
+    F -->|Yes| G["Initialize MENU state and Game"]
+    G --> H["Start pgzrun.go()"]
+    H --> I["Pygame Zero frame loop"]
+    I --> J["update()"]
+    J --> K{"Current game state"}
+
+    K -->|MENU| L{"Space pressed?"}
+    L -->|Yes| M["Set PLAY state and create Game"]
+    L -->|No| N["Handle player-count keys"]
+    N --> O["Update attract-mode Game"]
+    O --> P["draw()"]
+    M --> P
+
+    K -->|PLAY| Q{"Either score exceeds 9?"}
+    Q -->|Yes| R["Set GAME_OVER state"]
+    Q -->|No| S["game.update()"]
+    R --> P
+    S --> P
+
+    K -->|GAME_OVER| T{"Space pressed?"}
+    T -->|Yes| U["Reset to MENU and create Game"]
+    T -->|No| P
+    U --> P
+
+    S --> V["Update bats, ball, and impacts"]
+    O --> V
+    V --> W["Ball.update()"]
+    W --> X{"Ball collides or reaches arena boundary?"}
+    X -->|Yes| Y["Reverse direction, increase speed, create Impact, play sound"]
+    X -->|No| Z["Continue movement"]
+    Y --> AA{"Ball out of screen?"}
+    Z --> AA
+    AA -->|Yes| AB["Update score and concession timer"]
+    AA -->|No| AC["Remove expired impacts"]
+    AB --> AC
+    AC --> P
+
+    P --> AD["Render background, actors, effects, and scores"]
+    AD --> I
